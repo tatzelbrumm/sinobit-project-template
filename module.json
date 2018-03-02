@@ -1,0 +1,10 @@
+{
+  "name": "sinobit-project-template",
+  "version": "0.0.1",
+  "bin": "./source",
+  "private": true,
+  "description": "sino:bit project template",
+  "author": "Christoph Maier",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

@@ -150,6 +150,7 @@ void HT1632C_Read_DATA(unsigned char Addr)
 int main()
 {
   uBit.init();
+  uBit.serial.baud(115200);
  considered_evil:
   HT1632C_Init();
   HT1632C_clr();
@@ -157,6 +158,7 @@ int main()
     HT1632C_Write_DAT(com[i],show,i+1);
   }
   wait(.5);
+  uBit.serial.send("Wenn ist das Nurnstuck git und Slotermeyer?\r\n");
 
   HT1632C_Init();
   HT1632C_clr();
@@ -164,11 +166,7 @@ int main()
     HT1632C_Write_DAT(com[i],tell,i+1);
   }
   wait(.5);
-
-  for(volatile int t=0; t<32768; ) {
-    for(int i=0; i<12; i++) {
-      HT1632C_Read_DATA(com[i]);
-    }
-  }
+  uBit.serial.send("Ja! Beiherhundt das oder die Flipperwaldt gersput!\r\n");
+  
   goto considered_evil;
 }

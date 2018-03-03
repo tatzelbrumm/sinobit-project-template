@@ -26,7 +26,7 @@ static unsigned char show[24] = {
   0b10010100, 0b10010000,
   0b00000111, 0b00000000,
   0b00001000, 0b00100000,
-  0b00110000, 0b10010000,
+  0b00110000, 0b10110000,
   0b00001000, 0b00100000,
   0b00000111, 0b00000000,
   0b10010100, 0b10010000,
@@ -42,7 +42,7 @@ static unsigned char tell[24] = {
   0b10010100, 0b10010000,
   0b00000111, 0b00000000,
   0b00001000, 0b00100000,
-  0b00110000, 0b10010000,
+  0b00110000, 0b10110000,
   0b00001000, 0b00100000,
   0b00000111, 0b00000000,
   0b10010100, 0b10010000,
@@ -75,32 +75,34 @@ void HT1632C_Write_CMD(unsigned char cmd)                     //MCU向HT1632c写
   HT_CS=1;
 }
 
-void HT1632C_Write_DAT(unsigned char Addr, unsigned char data[], unsigned char num)
+void HT1632C_Write_DAT(unsigned char Addr, const unsigned char data[], unsigned char num)
 {
   unsigned char i;
   HT_CS=0;
   HT1632C_Write(0xa0,3);                                    //ID:101
   HT1632C_Write(Addr<<1,7);
 
+  unsigned char d= data[num<<1];
   for(i=0; i<8; i++) {
     HT_WR=0;
-    if(data[2*(num-1)]&0x80) {
+    if(d&0x80) {
       HT_DAT=1;
     } else {
       HT_DAT=0;
     }
-    data[2*(num-1)]<<=1;
+    d<<=1;
     HT_WR=1;
   }
 
+  d= data[(num<<1)+1];
   for(i=0; i<4; i++) {
     HT_WR=0;
-    if(data[2*num-1]&0x80) {
+    if(d&0x80) {
       HT_DAT=1;
     } else {
       HT_DAT=0;
     }
-    data[2*num-1]<<=1;
+    d<<=1;
     HT_WR=1;
   }
 
@@ -149,24 +151,35 @@ void HT1632C_Read_DATA(unsigned char Addr)
 
 int main()
 {
+  NRF_GPIO_Type *gpiobase= (NRF_GPIO_Type *)NRF_GPIO_BASE;
+
   uBit.init();
   uBit.serial.baud(115200);
+
  considered_evil:
   HT1632C_Init();
   HT1632C_clr();
   for(int i=0; i<12; i++) {
-    HT1632C_Write_DAT(com[i],show,i+1);
+    HT1632C_Write_DAT(com[i],show,i);
   }
   wait(.5);
   uBit.serial.send("Wenn ist das Nurnstuck git und Slotermeyer?\r\n");
+  printf("Dir  %08lx: ", uint32_t(&gpiobase->DIR));
+  printf("%08lx\r\n", gpiobase->DIR);
+  printf("In   %08lx: ", uint32_t(&gpiobase->IN));
+  printf("%08lx\r\n", gpiobase->IN);
 
   HT1632C_Init();
   HT1632C_clr();
   for(int i=0; i<12; i++) {
-    HT1632C_Write_DAT(com[i],tell,i+1);
+    HT1632C_Write_DAT(com[i],tell,i);
   }
   wait(.5);
   uBit.serial.send("Ja! Beiherhundt das oder die Flipperwaldt gersput!\r\n");
-  
+  printf("Dir  %08lx: ", uint32_t(&gpiobase->DIR));
+  printf("%08lx\r\n", gpiobase->DIR);
+  printf("In   %08lx: ", uint32_t(&gpiobase->IN));
+  printf("%08lx\r\n", gpiobase->IN);
+
   goto considered_evil;
 }

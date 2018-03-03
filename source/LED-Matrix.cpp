@@ -20,23 +20,60 @@ DigitalOut HT_RD(P0_22);
 DigitalOut HT_WR(P0_23);
 DigitalOut HT_DAT(P0_21);
 
-static uint16_t show[13] = {
-  0b0000000000000000,
-  0b0011100000000000,
-  0b0100010001100000,
-  0b1001010010010000,
-  0b0000011100000000,
-  0b0000100000100000,
-  0b0011000100110000,
-  0b0000100000100000,
-  0b0000011100000000,
-  0b1001010010010000,
-  0b0100010001100000,
-  0b0011100000000000,
-  0b0000000000000000
+static const uint16_t om[][12] = {
+{
+0b0011111100000000,
+0b0100000010000000,
+0b1000000001010000,
+0b1000000001010000,
+0b1000000001110000,
+0b1000000000000000,
+0b1000000000000000,
+0b1000000001110000,
+0b1000000001010000,
+0b1000000001010000,
+0b0100000010000000,
+0b0011111100000000
+},
+{
+0b0011111100000000,
+0b0100000010000000,
+0b1010001001010000,
+0b1010100101010000,
+0b1001011001110000,
+0b1100010000000000,
+0b0010100000000000,
+0b1010101001110000,
+0b0010100101010000,
+0b1100011001010000,
+0b0100000010000000,
+0b0011111100000000
+},
+{
+0b0000000000000000,
+0b0000000000000000,
+0b0010001000000000,
+0b0010100100000000,
+0b0001011000000000,
+0b1100010000000000,
+0b0010100000000000,
+0b1010101000000000,
+0b0010100100000000,
+0b1100011000000000,
+0b0000000000000000,
+0b0000000000000000
+}
 };
 
-static uint16_t *tell= show+1;
+const char OM[]="\nOM\n",
+  MANI[]= "\nMANI\n",
+  PADME[]= "\nPADME\n",
+  HUM[]= "\nHUM\n";
+
+static const uint16_t *show[]= {om[0], om[1], om[2], om[1]};
+static const char *meditations[4]= {
+  OM, MANI, PADME, HUM
+};
 
 static unsigned char com[12] = {0x00, 0x04, 0x08, 0x0C, 0x10, 0x14, 0x18, 0x1C, 0x20, 0x24, 0x28, 0x2C};
 
@@ -130,30 +167,20 @@ int main()
   uBit.init();
   uBit.serial.baud(115200);
 
- considered_evil:
   HT1632C_Init();
+  int count=0;
+ considered_harmful:
   HT1632C_clr();
   for(int i=0; i<12; i++) {
-    HT1632C_Write_DAT(com[i],show,i);
+    HT1632C_Write_DAT(com[i],show[count],i);
   }
-  wait(.5);
-  uBit.serial.send("Wenn ist das Nurnstuck git und Slotermeyer?\r\n");
+  uBit.serial.send(meditations[count++]);
+  count%=4;
+  wait(1.618033988749895);
   printf("Dir  %08lx: ", uint32_t(&gpiobase->DIR));
   printf("%08lx\r\n", gpiobase->DIR);
   printf("In   %08lx: ", uint32_t(&gpiobase->IN));
   printf("%08lx\r\n", gpiobase->IN);
 
-  HT1632C_Init();
-  HT1632C_clr();
-  for(int i=0; i<12; i++) {
-    HT1632C_Write_DAT(com[i],tell,i);
-  }
-  wait(.5);
-  uBit.serial.send("Ja! Beiherhundt das oder die Flipperwaldt gersput!\r\n");
-  printf("Dir  %08lx: ", uint32_t(&gpiobase->DIR));
-  printf("%08lx\r\n", gpiobase->DIR);
-  printf("In   %08lx: ", uint32_t(&gpiobase->IN));
-  printf("%08lx\r\n", gpiobase->IN);
-
-  goto considered_evil;
+  goto considered_harmful;
 }

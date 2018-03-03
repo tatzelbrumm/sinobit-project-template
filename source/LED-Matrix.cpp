@@ -20,23 +20,23 @@ DigitalOut HT_RD(P0_22);
 DigitalOut HT_WR(P0_23);
 DigitalOut HT_DAT(P0_21);
 
-static unsigned char show[26] = {
-  0b00000000, 0b00000000,
-  0b00111000, 0b00000000,
-  0b01000100, 0b01100000,
-  0b10010100, 0b10010000,
-  0b00000111, 0b00000000,
-  0b00001000, 0b00100000,
-  0b00110000, 0b10110000,
-  0b00001000, 0b00100000,
-  0b00000111, 0b00000000,
-  0b10010100, 0b10010000,
-  0b01000100, 0b01100000,
-  0b00111000, 0b00000000,
-  0b00000000, 0b00000000
+static uint16_t show[13] = {
+  0b0000000000000000,
+  0b0011100000000000,
+  0b0100010001100000,
+  0b1001010010010000,
+  0b0000011100000000,
+  0b0000100000100000,
+  0b0011000100110000,
+  0b0000100000100000,
+  0b0000011100000000,
+  0b1001010010010000,
+  0b0100010001100000,
+  0b0011100000000000,
+  0b0000000000000000
 };
 
-static unsigned char *tell= show+2;
+static uint16_t *tell= show+1;
 
 static unsigned char com[12] = {0x00, 0x04, 0x08, 0x0C, 0x10, 0x14, 0x18, 0x1C, 0x20, 0x24, 0x28, 0x2C};
 
@@ -63,17 +63,16 @@ void HT1632C_Write_CMD(unsigned char cmd)                     //MCU向HT1632c写
   HT_CS=1;
 }
 
-void HT1632C_Write_DAT(unsigned char Addr, const unsigned char data[], unsigned char num)
+void HT1632C_Write_DAT(unsigned char Addr, const uint16_t data[], unsigned char num)
 {
-  unsigned char i;
   HT_CS=0;
   HT1632C_Write(0xa0,3);                                    //ID:101
   HT1632C_Write(Addr<<1,7);
 
-  unsigned char d= data[num<<1];
-  for(i=0; i<8; i++) {
+  uint16_t d= data[num];
+  for(unsigned char i=0; i<12; i++) {
     HT_WR=0;
-    if(d&0x80) {
+    if(d&0x8000) {
       HT_DAT=1;
     } else {
       HT_DAT=0;
@@ -81,19 +80,6 @@ void HT1632C_Write_DAT(unsigned char Addr, const unsigned char data[], unsigned 
     d<<=1;
     HT_WR=1;
   }
-
-  d= data[(num<<1)+1];
-  for(i=0; i<4; i++) {
-    HT_WR=0;
-    if(d&0x80) {
-      HT_DAT=1;
-    } else {
-      HT_DAT=0;
-    }
-    d<<=1;
-    HT_WR=1;
-  }
-
   HT_CS=1;
 }
 

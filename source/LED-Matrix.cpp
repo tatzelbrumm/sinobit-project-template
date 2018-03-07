@@ -2,18 +2,18 @@
 
 MicroBit uBit;
 
-/******************指令表/Instructions**********************/
-#define SYS_DIS 0x00                //关闭系统震荡/Turn off system shock
-#define SYS_EN  0x01                //打开系统震荡/Turn on  system shock
-#define LED_OFF 0x02                //关闭LED显示/Turn off LED display
-#define LED_ON  0x03                //打开LED显示/Turn on LED display
-#define BLINK_OFF   0x08            //关闭闪烁   /Close blink
-#define BLINK_ON    0x09            //打开闪烁   /Open blink            
-#define SLAVE_MODE  0x10            //从模式     /Slave mode
-#define RC_MASTER_MODE  0x18        //内部RC时钟 /Use internal clock 
-#define COM_OPTION  0x24            //24:16COM，NMOS。C：COM，PMOS。
-#define PWM_DUTY    0xAF            //PWM亮度控制 /PWM Brightness Control
-/****************引脚定义 I/O definition**********************/
+/******************Instructions**********************/
+#define SYS_DIS 0x00                //Turn off system shock
+#define SYS_EN  0x01                //Turn on  system shock
+#define LED_OFF 0x02                //Turn off LED display
+#define LED_ON  0x03                //Turn on LED display
+#define BLINK_OFF   0x08            //Close blink
+#define BLINK_ON    0x09            //Open blink
+#define SLAVE_MODE  0x10            //Slave mode
+#define RC_MASTER_MODE  0x18        //Use internal clock
+#define COM_OPTION  0x24            //24:16COM NMOS COM PMOS
+#define PWM_DUTY    0xAF            //PWM Brightness Control
+/****************I/O definition**********************/
 
 DigitalOut HT_CS(P0_16);
 DigitalOut HT_RD(P0_22);
@@ -94,7 +94,7 @@ void HT1632C_Write(unsigned char Data, unsigned char cnt)      //MCU writes the 
   }
 }
 
-void HT1632C_Write_CMD(unsigned char cmd)                     //MCU向HT1632c写命令/MCU writes commands to ht1632c
+void HT1632C_Write_CMD(unsigned char cmd)                     //MCU writes commands to ht1632c
 {
   HT_DAT.output();
   HT_CS=0;
@@ -124,7 +124,7 @@ void HT1632C_Write_DAT(unsigned char Addr, const uint16_t data[], unsigned char 
   HT_CS=1;
 }
 
-void HT1632C_clr(void)  //清屏函数/Clear function
+void HT1632C_clr(void)  //Clear function
 {
     unsigned char i;
     HT_DAT.output();
@@ -137,18 +137,18 @@ void HT1632C_clr(void)  //清屏函数/Clear function
     HT_CS=1;
 }
 
-void HT1632C_Init(void)                 //HT1632C初始化函数/HT1632C Init Function
+void HT1632C_Init(void)                 //HT1632C Init Function
 {
   HT_CS=1;
   HT_WR=1;
   HT_DAT=1;
-  HT1632C_Write_CMD(SYS_DIS);         //关闭HT1632C内部RC时钟/Close the HT1632C internal clock
-  HT1632C_Write_CMD(COM_OPTION);      //选择HT1632C工作模式/Select HT1632C work mode
-  HT1632C_Write_CMD(RC_MASTER_MODE);  //选择内部RC时钟/Select internal clock
-  HT1632C_Write_CMD(SYS_EN);          //打开HT1632C内部RC时钟/Open the HT1632C internal clock
-  HT1632C_Write_CMD(PWM_DUTY);        //PWM亮度设置/Init the PWM Brightness
-  HT1632C_Write_CMD(BLINK_OFF);       //关闭闪烁   /Close blink
-  HT1632C_Write_CMD(LED_ON);          //打开LED显示/ Turn on LED display
+  HT1632C_Write_CMD(SYS_DIS);         //Close the HT1632C internal clock
+  HT1632C_Write_CMD(COM_OPTION);      //Select HT1632C work mode
+  HT1632C_Write_CMD(RC_MASTER_MODE);  //Select internal clock
+  HT1632C_Write_CMD(SYS_EN);          //Open the HT1632C internal clock
+  HT1632C_Write_CMD(PWM_DUTY);        //Init the PWM Brightness
+  HT1632C_Write_CMD(BLINK_OFF);       //Close blink
+  HT1632C_Write_CMD(LED_ON);          //Turn on LED display
 }
 
 int16_t HT1632C_Read_DATA(unsigned char Addr)

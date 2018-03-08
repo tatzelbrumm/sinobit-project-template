@@ -18,7 +18,7 @@ MicroBit uBit;
 DigitalOut HT_CS(P0_16);
 DigitalOut HT_RD(P0_22);
 DigitalOut HT_WR(P0_23);
-DigitalOut HT_DAT(P0_21);
+DigitalInOut HT_DAT(P0_21, PIN_INPUT, PullNone, 0);
 
 static const uint16_t om[][12] = {
 {
@@ -77,7 +77,9 @@ static const char *meditations[4]= {
 
 static unsigned char com[12] = {0x00, 0x04, 0x08, 0x0C, 0x10, 0x14, 0x18, 0x1C, 0x20, 0x24, 0x28, 0x2C};
 
-void HT1632C_Write(unsigned char Data, unsigned char cnt)      //MCU向HT1632C写数据函数，高位在前/MCU writes the data to ht1632c, and the high position is in front
+uint16_t readback[12];
+
+void HT1632C_Write(unsigned char Data, unsigned char cnt)      //MCU writes the data to ht1632c, and the high position is in front
 {
   unsigned char i;
   for(i=0; i<cnt; i++) {
@@ -94,6 +96,7 @@ void HT1632C_Write(unsigned char Data, unsigned char cnt)      //MCU向HT1632C�
 
 void HT1632C_Write_CMD(unsigned char cmd)                     //MCU向HT1632c写命令/MCU writes commands to ht1632c
 {
+  HT_DAT.output();
   HT_CS=0;
   HT1632C_Write(0x80,3);                                    //ID:100
   HT1632C_Write(cmd,9);
@@ -102,6 +105,7 @@ void HT1632C_Write_CMD(unsigned char cmd)                     //MCU向HT1632c写
 
 void HT1632C_Write_DAT(unsigned char Addr, const uint16_t data[], unsigned char num)
 {
+  HT_DAT.output();
   HT_CS=0;
   HT1632C_Write(0xa0,3);                                    //ID:101
   HT1632C_Write(Addr<<1,7);
@@ -123,6 +127,7 @@ void HT1632C_Write_DAT(unsigned char Addr, const uint16_t data[], unsigned char 
 void HT1632C_clr(void)  //清屏函数/Clear function
 {
     unsigned char i;
+    HT_DAT.output();
     HT_CS=0;
     HT1632C_Write(0xa0,3);
     HT1632C_Write(0x00,7);
@@ -146,18 +151,22 @@ void HT1632C_Init(void)                 //HT1632C初始化函数/HT1632C Init Fu
   HT1632C_Write_CMD(LED_ON);          //打开LED显示/ Turn on LED display
 }
 
-void HT1632C_Read_DATA(unsigned char Addr)
+int16_t HT1632C_Read_DATA(unsigned char Addr)
 {
   unsigned char i;
+  HT_DAT.output();
   HT_CS=0;
   HT1632C_Write(0xc0,3);                                    //ID:101
   HT1632C_Write(Addr<<1,7);
+  HT_DAT.input();
+  int16_t data=0;
   for(i=0; i<12; i++) {
     HT_RD=0;
-    asm("nop");
+    data= data<<1 | HT_DAT;
     HT_RD=1;
   }
   HT_CS=1;
+  return data<<4;
 }
 
 int main()
@@ -176,6 +185,15 @@ int main()
   }
   uBit.serial.send(meditations[count++]);
   count%=4;
+  for(int i=0; i<12; i++) {
+    readback[i]= HT1632C_Read_DATA(com[i]);
+  }
+  for(int r=16; 4<r--; ) {
+    for(int c=0; c<12; c++) {
+      printf(readback[c]&(1<<r)?"#":".");
+    }
+    puts("");
+  }
   wait(1.618033988749895);
   printf("Dir  %08lx: ", uint32_t(&gpiobase->DIR));
   printf("%08lx\r\n", gpiobase->DIR);

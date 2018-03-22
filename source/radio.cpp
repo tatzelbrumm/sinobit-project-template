@@ -64,12 +64,12 @@ uint16_t readback[12];
 static volatile unsigned char omCount=0;
 static volatile int redraw= 1;
 
-void onData(MicroBitEvent event)
+void onData(MicroBitEvent e)
 {
-    ManagedString str=uBit.radio.datagram.recv();
-    omCount= str.charAt(0)-0x30;
+    PacketBuffer b=uBit.radio.datagram.recv();
+    omCount= b[0];
     uBit.serial.send("\r\nReceived ");
-    uBit.serial.send(str);
+    uBit.serial.send(omCount+0x30);
     uBit.serial.send("\r\n");
     redraw= 1;
 }

@@ -66,8 +66,9 @@ int main()
   NRF_GPIO_Type *gpiobase= (NRF_GPIO_Type *)NRF_GPIO_BASE;
 
   uBit.init();
-  uBit.radio.enable();
   uBit.serial.baud(115200);
+  uBit.radio.enable();
+  PacketBuffer b(1);
 
   HT1632C_Init();
   unsigned char count=0;
@@ -84,7 +85,8 @@ int main()
   count%=4;
   uBit.serial.send(meditations[count]);
   if (redraw) {
-      uBit.radio.datagram.send(ManagedString(count+0x30));
+      b[0]= count;
+      uBit.radio.datagram.send(b);
       HT1632C_clr();
       HT1632C_Write_Pattern(show[count]);
       HT1632C_Read_Pattern(readback);

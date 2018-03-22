@@ -84,7 +84,7 @@ int main()
   count%=4;
   uBit.serial.send(meditations[count]);
   if (redraw) {
-      uBit.radio.datagram.send(ManagedString(count));
+      uBit.radio.datagram.send(ManagedString(count+0x30));
       HT1632C_clr();
       HT1632C_Write_Pattern(show[count]);
       HT1632C_Read_Pattern(readback);

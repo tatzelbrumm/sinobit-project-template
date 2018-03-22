@@ -67,20 +67,34 @@ int main()
   uBit.serial.baud(115200);
 
   HT1632C_Init();
-  int count=0;
+  unsigned int count=0;
+  int redraw=1;
  considered_harmful:
-  HT1632C_clr();
-  HT1632C_Write_Pattern(show[count]);
-  uBit.serial.send(meditations[count++]);
-  count%=4;
-  HT1632C_Read_Pattern(readback);
-  for(int r=16; 4<r--; ) {
-    for(int c=0; c<12; c++) {
-      printf(readback[c]&(1<<r)?"#":".");
-    }
-    puts("");
+  if (uBit.buttonA.isPressed()) {
+      count++;
+      redraw=1;
   }
-  wait(1.618033988749895);
+  else if (uBit.buttonB.isPressed()) {
+      count--;
+      redraw=1;
+  }
+  count%=4;
+  uBit.serial.send(meditations[count]);
+  if (redraw) {
+      HT1632C_clr();
+      HT1632C_Write_Pattern(show[count]);
+      HT1632C_Read_Pattern(readback);
+      for(int r=16; 4<r--; ) {
+          for(int c=0; c<12; c++) {
+              printf(readback[c]&(1<<r)?"#":".");
+          }
+          puts("");
+      }
+      redraw=0;
+  }
+
+  uBit.sleep(1680);
+
   printf("Dir  %08lx: ", uint32_t(&gpiobase->DIR));
   printf("%08lx\r\n", gpiobase->DIR);
   printf("In   %08lx: ", uint32_t(&gpiobase->IN));

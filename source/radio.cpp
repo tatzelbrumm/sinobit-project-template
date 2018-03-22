@@ -61,32 +61,35 @@ static const char *meditations[4]= {
 
 uint16_t readback[12];
 
+static volatile unsigned char omCount=0;
+static volatile int redraw= 1;
+
+void onData(MicroBitEvent event)
+{
+    ManagedString str=uBit.radio.datagram.recv();
+    omCount= str.charAt(0)-0x30;
+    uBit.serial.send("\r\nReceived ");
+    uBit.serial.send(str);
+    uBit.serial.send("\r\n");
+    redraw= 1;
+}
+
 int main()
 {
   NRF_GPIO_Type *gpiobase= (NRF_GPIO_Type *)NRF_GPIO_BASE;
 
   uBit.init();
+  uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
   uBit.radio.enable();
   uBit.serial.baud(115200);
 
   HT1632C_Init();
-  unsigned char count=0;
-  int redraw=1;
+  
  considered_harmful:
-  if (uBit.buttonA.isPressed()) {
-      count++;
-      redraw=1;
-  }
-  else if (uBit.buttonB.isPressed()) {
-      count--;
-      redraw=1;
-  }
-  count%=4;
-  uBit.serial.send(meditations[count]);
+  uBit.serial.send(meditations[omCount]);
   if (redraw) {
-      uBit.radio.datagram.send(ManagedString(count));
       HT1632C_clr();
-      HT1632C_Write_Pattern(show[count]);
+      HT1632C_Write_Pattern(show[omCount]);
       HT1632C_Read_Pattern(readback);
       for(int r=16; 4<r--; ) {
           for(int c=0; c<12; c++) {

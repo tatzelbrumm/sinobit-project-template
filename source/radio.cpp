@@ -1,3 +1,16 @@
+/*
+ * radio.cpp
+ * =========
+ * Transmitter side
+ *
+ * Compile with 
+ * #define MICROBIT_BLE_ENABLED      0
+ * #define MICROBIT_BLE_PAIRING_MODE 0
+ * in yotta_modules/microbit-dal/inc/core/MicroBitConfig.h
+ *
+ * see https://lancaster-university.github.io/microbit-docs/ubit/radio/# for details
+ */
+
 #include "MicroBit.h"
 #include "LED-Matrix.h"
 #include "registerdump.h"

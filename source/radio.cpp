@@ -59,15 +59,17 @@ static const char *meditations[4]= {
 };
 
 uint16_t readback[12];
+
 int main()
 {
   NRF_GPIO_Type *gpiobase= (NRF_GPIO_Type *)NRF_GPIO_BASE;
 
   uBit.init();
+  uBit.radio.enable();
   uBit.serial.baud(115200);
 
   HT1632C_Init();
-  unsigned int count=0;
+  unsigned char count=0;
   int redraw=1;
  considered_harmful:
   if (uBit.buttonA.isPressed()) {
@@ -81,6 +83,7 @@ int main()
   count%=4;
   uBit.serial.send(meditations[count]);
   if (redraw) {
+      uBit.radio.datagram.send(ManagedString(count));
       HT1632C_clr();
       HT1632C_Write_Pattern(show[count]);
       HT1632C_Read_Pattern(readback);

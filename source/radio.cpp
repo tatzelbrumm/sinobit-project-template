@@ -1,5 +1,6 @@
 #include "MicroBit.h"
 #include "LED-Matrix.h"
+#include "registerdump.h"
 
 MicroBit uBit;
 
@@ -102,6 +103,13 @@ int main()
   printf("%08lx\r\n", gpiobase->DIR);
   printf("In   %08lx: ", uint32_t(&gpiobase->IN));
   printf("%08lx\r\n", gpiobase->IN);
+
+  printf("\r\nInterrupt registers\r\n");
+  dumpIrqEnables();
+  printf("\r\nClock registers\r\n");
+  dumpClockRegisters();
+  printf("\r\nRadio registers\r\n");
+  dumpRadioRegisters();
 
   goto considered_harmful;
 }

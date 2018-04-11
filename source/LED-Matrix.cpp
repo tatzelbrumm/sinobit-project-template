@@ -121,8 +121,8 @@ void ExpandGlyph(const uint8_t glyph[18], uint16_t *bitmap)
     for (uint8_t col=0; col<6; col++) {
         uint8_t column= col<<1;
         uint8_t lsn= glyph[12+col];
-        uint16_t c0= (glyph[column]<<16) + (lsn & 0xF0);
-        uint16_t c1= (glyph[column+1]<<16) + ((lsn << 4) & 0xF0);
+        uint16_t c0= (glyph[column]<<8) + (lsn & 0xF0);
+        uint16_t c1= (glyph[column+1]<<8) + ((lsn << 4) & 0xF0);
         *bitmap++= c0;
         *bitmap++= c1;
     }
@@ -150,7 +150,8 @@ int main()
   HT1632C_clr();
   WriteGlyph(glyph[count]);
   uBit.serial.send(charcode[count++]);
-  count%=4;
+  uBit.serial.send("\n");
+  count%=3000;
   for(int i=0; i<12; i++) {
     readback[i]= HT1632C_Read_DATA(com[i]);
   }

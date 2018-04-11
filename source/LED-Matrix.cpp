@@ -1,4 +1,5 @@
 #include "MicroBit.h"
+#include "font.h"
 
 MicroBit uBit;
 
@@ -20,60 +21,6 @@ DigitalOut HT_RD(P0_22);
 DigitalOut HT_WR(P0_23);
 DigitalInOut HT_DAT(P0_21, PIN_INPUT, PullNone, 0);
 
-static const uint16_t om[][12] = {
-{
-0b0011111100000000,
-0b0100000010000000,
-0b1000000001010000,
-0b1000000001010000,
-0b1000000001110000,
-0b1000000000000000,
-0b1000000000000000,
-0b1000000001110000,
-0b1000000001010000,
-0b1000000001010000,
-0b0100000010000000,
-0b0011111100000000
-},
-{
-0b0011111100000000,
-0b0100000010000000,
-0b1010001001010000,
-0b1010100101010000,
-0b1001011001110000,
-0b1100010000000000,
-0b0010100000000000,
-0b1010101001110000,
-0b0010100101010000,
-0b1100011001010000,
-0b0100000010000000,
-0b0011111100000000
-},
-{
-0b0000000000000000,
-0b0000000000000000,
-0b0010001000000000,
-0b0010100100000000,
-0b0001011000000000,
-0b1100010000000000,
-0b0010100000000000,
-0b1010101000000000,
-0b0010100100000000,
-0b1100011000000000,
-0b0000000000000000,
-0b0000000000000000
-}
-};
-
-const char OM[]="\nOM\n",
-  MANI[]= "\nMANI\n",
-  PADME[]= "\nPADME\n",
-  HUM[]= "\nHUM\n";
-
-static const uint16_t *show[]= {om[0], om[1], om[2], om[1]};
-static const char *meditations[4]= {
-  OM, MANI, PADME, HUM
-};
 
 static unsigned char com[12] = {0x00, 0x04, 0x08, 0x0C, 0x10, 0x14, 0x18, 0x1C, 0x20, 0x24, 0x28, 0x2C};
 
@@ -201,10 +148,8 @@ int main()
   int count=0;
  considered_harmful:
   HT1632C_clr();
-  for(int i=0; i<12; i++) {
-    HT1632C_Write_DAT(com[i],show[count],i);
-  }
-  uBit.serial.send(meditations[count++]);
+  WriteGlyph(glyph[count]);
+  uBit.serial.send(charcode[count++]);
   count%=4;
   for(int i=0; i<12; i++) {
     readback[i]= HT1632C_Read_DATA(com[i]);
@@ -215,7 +160,7 @@ int main()
     }
     puts("");
   }
-  wait(1.618033988749895);
+  wait(0.4);
   printf("Dir  %08lx: ", uint32_t(&gpiobase->DIR));
   printf("%08lx\r\n", gpiobase->DIR);
   printf("In   %08lx: ", uint32_t(&gpiobase->IN));

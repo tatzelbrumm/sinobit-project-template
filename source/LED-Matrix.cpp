@@ -169,6 +169,27 @@ int16_t HT1632C_Read_DATA(unsigned char Addr)
   return data<<4;
 }
 
+void ExpandGlyph(const uint8_t glyph[18], uint16_t *bitmap)
+{
+    for (uint8_t col=0; col<6; col++) {
+        uint8_t column= col<<1;
+        uint8_t lsn= glyph[12+col];
+        uint16_t c0= (glyph[column]<<16) + (lsn & 0xF0);
+        uint16_t c1= (glyph[column+1]<<16) + ((lsn << 4) & 0xF0);
+        *bitmap++= c0;
+        *bitmap++= c1;
+    }
+}
+
+void WriteGlyph(const uint8_t glyph[18])
+{
+    uint16_t bitmap[12];
+    ExpandGlyph(glyph, bitmap);
+    for (int c= 0; c<12; c++) {
+        HT1632C_Write_DAT(com[c], bitmap, c);
+    }
+}
+
 int main()
 {
   NRF_GPIO_Type *gpiobase= (NRF_GPIO_Type *)NRF_GPIO_BASE;

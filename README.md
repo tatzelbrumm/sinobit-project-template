@@ -24,7 +24,7 @@ Install [OpenOCD](http://openocd.org/) and run `openocd -f openocd.cfg` and use 
 to commence debugging:
 
 ```
-$ arm-none-eabi-gdb build/sinobit-mini-classic-gcc/source/sinobit-project-template
+$ arm-none-eabi-gdb build/sinobit-classic-gcc/source/sinobit-project-template
 (gdb) target remote localhost:3333
 (gdb) break main
 (gdb) mon reset

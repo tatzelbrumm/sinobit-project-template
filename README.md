@@ -1,4 +1,4 @@
-# Sino:bit project template
+# Sino:bit project template - NOT READY FOR PRODUCTION. TESTING VERSION
 
 - first, install [yotta](http://docs.yottabuild.org/#installing)
 - run `yt update` once, it will download all required dependencies

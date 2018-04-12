@@ -4,7 +4,7 @@
   "description": "Sino:bit Project Template",
   "license": "Apache 2.0",
   "dependencies": {
-    "sinobit": "ScepticInt/sinobit"
+    "microbit": "ScepticInt/sinobit"
   },
   "targetDependencies": {},
   "bin": "./source"

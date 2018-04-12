@@ -7,10 +7,10 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_TOOLCHAIN_FILE yotta_targets/mbed-gcc/CMake/toolchain.cmake)
 set(CMAKE_BUILD_TYPE Debug)
 
-project(calliope-firmware C CXX)
-include(yotta_targets/calliope-mini-classic-gcc/CMake/toolchain.cmake)
+project(sinobit-firmware C CXX)
+include(yotta_targets/sinobit-classic-gcc/CMake/toolchain.cmake)
 
-add_definitions(-DNRF51 -DTARGET_NRF51 -DTARGET_NRF51_CALLIOPE)
+add_definitions(-DNRF51 -DTARGET_NRF51 -DTARGET_NRF51_sinobit)
 
 file(GLOB MICROBIT_DAL_INC yotta_modules/microbit-dal/inc/*)
 file(GLOB_RECURSE MICROBIT_DAL_SRC yotta_modules/microbit-dal/source/*.cpp)
@@ -30,7 +30,7 @@ file(GLOB MBED_INC
         yotta_modules/mbed-classic/targets/cmsis/TARGET_NORDIC
         yotta_modules/mbed-classic/targets/cmsis/TARGET_NORDIC/TARGET_MCU_NRF51822
         yotta_modules/mbed-classic/targets/hal/TARGET_NORDIC/TARGET_MCU_NRF51822
-        yotta_modules/mbed-classic/targets/hal/TARGET_NORDIC/TARGET_MCU_NRF51822/TARGET_NRF51_CALLIOPE
+        yotta_modules/mbed-classic/targets/hal/TARGET_NORDIC/TARGET_MCU_NRF51822/TARGET_NRF51_sinobit
         yotta_modules/microbit-dal/yotta_modules/mbed-drivers
         yotta_modules/microbit-dal/yotta_modules/minar
         yotta_modules/microbit-dal/yotta_modules/ble

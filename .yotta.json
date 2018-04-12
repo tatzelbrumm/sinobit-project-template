@@ -1,6 +1,6 @@
 {
   "build": {
-    "target": "calliope-mini-classic-gcc,*",
+    "target": "sinobit-classic-gcc,*",
     "targetSetExplicitly": true
   }
 }

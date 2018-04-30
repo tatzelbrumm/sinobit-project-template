@@ -7,6 +7,6 @@
   "author": "Christoph Maier",
   "license": "Apache-2.0",
   "dependencies": {
-    "microbit": "lancaster-university/microbit"
+    "sinobit": "tatzelbrumm/microbit#sinobit-tatzelbrumm"
   }
 }

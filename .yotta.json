@@ -1,6 +1,6 @@
 {
   "build": {
-    "target": "bbc-microbit-classic-gcc,*",
+    "target": "sinobit-classic-gcc,*",
     "targetSetExplicitly": true
   }
 }

@@ -75,16 +75,25 @@ static const char *meditations[4]= {
 uint16_t readback[12];
 
 static volatile unsigned char omCount=0;
-static volatile int redraw= 1;
 
 void onData(MicroBitEvent e)
 {
     PacketBuffer b=uBit.radio.datagram.recv();
     omCount= b[0];
     uBit.serial.send("\r\nReceived ");
-    uBit.serial.send(omCount+0x30);
+    uBit.serial.send(omCount);
     uBit.serial.send("\r\n");
-    redraw= 1;
+
+    uBit.serial.send(meditations[omCount]);
+    HT1632C_clr();
+    HT1632C_Write_Pattern(show[omCount]);
+    HT1632C_Read_Pattern(readback);
+    for(int r=16; 4<r--; ) {
+        for(int c=0; c<12; c++) {
+            printf(readback[c]&(1<<r)?"#":".");
+        }
+        puts("");
+    }
 }
 
 int main()
@@ -92,40 +101,11 @@ int main()
   NRF_GPIO_Type *gpiobase= (NRF_GPIO_Type *)NRF_GPIO_BASE;
 
   uBit.init();
+  HT1632C_Init();
+
   uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
   uBit.radio.enable();
   uBit.serial.baud(115200);
 
-  HT1632C_Init();
-  
- considered_harmful:
-  uBit.serial.send(meditations[omCount]);
-  if (redraw) {
-      HT1632C_clr();
-      HT1632C_Write_Pattern(show[omCount]);
-      HT1632C_Read_Pattern(readback);
-      for(int r=16; 4<r--; ) {
-          for(int c=0; c<12; c++) {
-              printf(readback[c]&(1<<r)?"#":".");
-          }
-          puts("");
-      }
-      redraw=0;
-  }
-
-  uBit.sleep(1680);
-
-  printf("Dir  %08lx: ", uint32_t(&gpiobase->DIR));
-  printf("%08lx\r\n", gpiobase->DIR);
-  printf("In   %08lx: ", uint32_t(&gpiobase->IN));
-  printf("%08lx\r\n", gpiobase->IN);
-
-  printf("\r\nInterrupt registers\r\n");
-  dumpIrqEnables();
-  printf("\r\nClock registers\r\n");
-  dumpClockRegisters();
-  printf("\r\nRadio registers\r\n");
-  dumpRadioRegisters();
-
-  goto considered_harmful;
+  release_fiber();
 }

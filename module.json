@@ -7,6 +7,6 @@
   "author": "Christoph Maier",
   "license": "Apache-2.0",
   "dependencies": {
-    "sinobit": "tatzelbrumm/microbit#sinobit-tatzelbrumm"
+    "sinobit": "tatzelbrumm/microbit#sinobit-tatzelbrumm-radio"
   }
 }
